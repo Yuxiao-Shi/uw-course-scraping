@@ -35,8 +35,8 @@ for d in departements:
     '''
     Create a department csv
     '''
-    dir_name = 'courses_by_department_' + quarter
-    csv_file_name = department_abbr + '_courses_' + quarter + '_UW.csv'
+    dir_name = 'courses_by_department_' + quarter.lower()
+    csv_file_name = department_abbr + '_courses_' + quarter.lower() + '_UW.csv'
     if not os.path.exists(dir_name):
         os.makedirs(dir_name)
         print("Directory ", dir_name, " Created ")
