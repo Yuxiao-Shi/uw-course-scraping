@@ -9,44 +9,41 @@ time_sched_home = root_url + '/timeschd/' + quarter + '/'
 response = requests.get(time_sched_home)
 soup = BeautifulSoup(response.text, 'html.parser')
 
+'''
+Create a all-department csv
+'''
+csv_file_name = 'courses_' + quarter.lower() + '_UW.csv'
+with open(csv_file_name, 'w', newline='') as csv_file:
+    csv_writer = writer(csv_file)
+    headers = [
+        'department_name',
+        'department_abbr',
+        'department_url',
+        'course_num',
+        'course_name',
+        'course_credit_type',
+        'course_myplan_url']
+    csv_writer.writerow(headers)
 
-def department_match(tag):
-    '''
-    Filters out the department course home pages.
+    def department_match(tag):
+        '''
+        Filters out the department course home pages.
 
-    Param: the HTML object tag.
-    Returns: True if tag has attribute 'href' and its text content ends with
-    departement abbreviations enclosed in parenthesis.
-    Example matched text content: Afro-American Studies (AFRAM)
-    '''
-    return tag.has_attr('href') and re.search(".*\((.*)\)", tag.get_text())
+        Param: the HTML object tag.
+        Returns: True if tag has attribute 'href' and its text content ends with
+        departement abbreviations enclosed in parenthesis.
+        Example matched text content: Afro-American Studies (AFRAM)
+        '''
+        return tag.has_attr('href') and re.search(".*\((.*)\)", tag.get_text())
 
-
-departements = soup.find_all(department_match)
-departements = set(departements)
-for d in departements:
-    department_name = d.get_text().replace(u'\xa0', ' ')
-    department_abbr = re.search(".*\((.*)\)", department_name).group(1)
-    department_abbr = department_abbr.replace(u'\xa0', ' ')
-    d_url_short = d['href']
-    department_url = time_sched_home + d['href']
-    print(department_name)
-
-    '''
-    Create a department csv
-    '''
-    with open('courses_by_department' + quarter + '/' +
-              department_abbr + '_courses_' + quarter + '_UW.csv', 'w', newline='') as csv_file:
-        csv_writer = writer(csv_file)
-        headers = [
-            'department_name',
-            'department_abbr',
-            'department_url',
-            'course_num',
-            'course_name',
-            'course_credit_type',
-            'course_myplan_url']
-        csv_writer.writerow(headers)
+    departements = soup.find_all(department_match)
+    departements = set(departements)
+    for d in departements:
+        department_name = d.get_text().replace(u'\xa0', ' ')
+        department_abbr = re.search(".*\((.*)\)", department_name).group(1)
+        department_abbr = department_abbr.replace(u'\xa0', ' ')
+        d_url_short = d['href']
+        department_url = time_sched_home + d['href']
 
         '''
         Courses
@@ -60,9 +57,9 @@ for d in departements:
 
         courses = d_soup.find_all(course_match)
         for course in courses:
-            course_name = course.get_text().replace(u'\xa0', ' ') # e.g. COMPUTER PRGRMNG I
+            course_name = course.get_text().replace(u'\xa0', ' ')  # e.g. COMPUTER PRGRMNG I
             course_num = re.sub(r'\s+', '', course.find_previous_sibling().get_text())
-            course_num = course_num.replace(u'\xa0', ' ') # e.g. CSE142
+            course_num = course_num.replace(u'\xa0', ' ')  # e.g. CSE142
             course_myplan_url = 'https://myplan.uw.edu/course/#/courses/' + course_num
 
             '''
@@ -86,7 +83,7 @@ for d in departements:
                 # print(course_num)
             '''
             course_credit_type = course.find_parent('td').find_next_sibling().find('b').get_text()
-            course_credit_type = .replace(u'\xa0', ' ')
+            course_credit_type = course_credit_type.replace(u'\xa0', ' ')
             if (re.search("\((.*)\)", course_credit_type) is not None):
                 # get rid of the parenthesis
                 course_credit_type = re.search("\((.*)\)", course_credit_type).group(1)
@@ -103,5 +100,4 @@ for d in departements:
                 str = str.replace(u'\xa0', ' ')
 
             csv_writer.writerow(row)
-
-# def write_courses_to_csv(csv_writer, department_url):
+        print(department_name)

@@ -64,9 +64,9 @@ for d in departements:
 
         courses = d_soup.find_all(course_match)
         for course in courses:
-            course_name = course.get_text().replace(u'\xa0', ' ') # e.g. COMPUTER PRGRMNG I
+            course_name = course.get_text().replace(u'\xa0', ' ')  # e.g. COMPUTER PRGRMNG I
             course_num = re.sub(r'\s+', '', course.find_previous_sibling().get_text())
-            course_num = course_num.replace(u'\xa0', ' ') # e.g. CSE142
+            course_num = course_num.replace(u'\xa0', ' ')  # e.g. CSE142
             course_myplan_url = 'https://myplan.uw.edu/course/#/courses/' + course_num
 
             '''
@@ -107,6 +107,6 @@ for d in departements:
                 str = str.replace(u'\xa0', ' ')
 
             csv_writer.writerow(row)
-        print(department_abbr)
+        print(department_name)
 
 # def write_courses_to_csv(csv_writer, department_url):
